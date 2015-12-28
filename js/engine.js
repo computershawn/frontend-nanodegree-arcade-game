@@ -80,7 +80,33 @@ var Engine = (function(global) {
      */
     function update(dt) {
         updateEntities(dt);
-        // checkCollisions();
+        checkCollisions();
+    }
+    
+    /* This function is called by main (our game loop) and itself calls all
+     * of the functions which may need to update entity's data. Based on how
+     * you implement your collision detection (when two entities occupy the
+     * same space, for instance when your character should die), you may find
+     * the need to add an additional function call here. For now, we've left
+     * it commented out - you may or may not want to implement this
+     * functionality this way (you could just implement collision detection
+     * on the entities themselves within your app.js file).
+     */
+    function checkCollisions() {
+        var contactRadius = 0.5 * 101;
+        allEnemies.forEach(function(enemy) {
+            //console.log(enemy.x + " " + player.x);
+            if(player.hittable && dist(enemy, player) < contactRadius) {
+                player.playerMinus();
+                console.log("damn");
+            }
+        });
+    }
+    
+    function dist(thing1, thing2) {
+        dx = thing1.x - thing2.x;
+        dy = thing1.y - thing2.y;
+        return Math.sqrt(dx*dx + dy*dy);
     }
 
     /* This is called by the update function and loops through all of the
@@ -137,6 +163,17 @@ var Engine = (function(global) {
         }
 
         renderEntities();
+
+        // var canvas = document.getElementById("myCanvas");
+        // var ctx = canvas.getContext("2d");
+        ctx.font = "18px 'Helvetica Neue', 'Helvetica', sans-serif";
+        ctx.fillStyle = "#ffffff";
+        ctx.textAlign = "right";
+        ctx.fillText(player.score, 490, 570);
+        ctx.textAlign = "left";
+        ctx.fillText(player.lives, 45, 570);
+        ctx.drawImage(Resources.get(player.sprite), 10, 530, 32, 54);
+        //ctx.drawImage(Resources.get('images/char-horn-girl.png'), 10, 535, 32, 54);
     }
 
     /* This function is called by the render function and is called on each game
@@ -171,7 +208,12 @@ var Engine = (function(global) {
         'images/water-block.png',
         'images/grass-block.png',
         'images/enemy-bug.png',
-        'images/char-boy.png'
+        'images/char-boy.png',
+        'images/char-princess-girl.png',
+        'images/char-horn-girl.png',
+        'images/char-pink-girl.png',
+        'images/char-cat-girl.png',
+        'images/char-blank.png'
     ]);
     Resources.onReady(init);
 
@@ -180,4 +222,5 @@ var Engine = (function(global) {
      * from within their app.js files.
      */
     global.ctx = ctx;
+    global.gameActive = true;
 })(this);
