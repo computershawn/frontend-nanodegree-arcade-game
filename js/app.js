@@ -1,7 +1,7 @@
 // Set some global variables for control of Player coordinates
-xStep = 101;
-yStep = 83;
-yOffset = 52;
+var X_STEP = 101;
+var Y_STEP = 83;
+var Y_OFFSET = 52;
 
 
 // Enemies our player must avoid
@@ -12,7 +12,7 @@ var Enemy = function() {
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
-    this.x = -1 * xStep * (1 + Math.round(Math.random() * 2));
+    this.x = -1 * X_STEP * (1 + Math.round(Math.random() * 2));
     this.y = 0;
     this.speed = 150 + Math.round(Math.random() * 50);
     
@@ -25,11 +25,11 @@ var Enemy = function() {
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
 Enemy.prototype.update = function(dt) {
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
+    // Multiply any movement by the dt parameter, which
+    // ensures the game runs at the same speed for all
+    // computers.
     if(this.delayCounter < this.delayDuration) {
-        this.delayCounter++;
+        this.delayCounter+=1;
     } else {
         this.readyMove = 1;
     }
@@ -49,19 +49,16 @@ Enemy.prototype.update = function(dt) {
 // If enemy has run off the board, set it back to start
 // point and set its speed.
 Enemy.prototype.reset = function() {
-    this.x = -1 * xStep * (1 + Math.round(Math.random() * 2));
+    this.x = -1 * X_STEP * (1 + Math.round(Math.random() * 2));
     if(gameActive) this.speed = 150 + Math.round(Math.random() * 50);
-}
+};
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
-// Enemies our player must avoid
+// ...
 var Player = function() {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
@@ -74,8 +71,8 @@ var Player = function() {
     
     this.row = 4;
     this.col = 2;
-    this.x = this.col * xStep;
-    this.y = this.row * yStep + yOffset;
+    this.x = this.col * X_STEP;
+    this.y = this.row * Y_STEP + Y_OFFSET;
     this.lives = 3;
     this.score = 0;
     this.fading = false;
@@ -88,8 +85,8 @@ var Player = function() {
 
 // Make changes to the player's x- and y-coordinates
 Player.prototype.update = function() {
-    this.x = this.col * xStep;
-    this.y = this.row * yStep + yOffset;
+    this.x = this.col * X_STEP;
+    this.y = this.row * Y_STEP + Y_OFFSET;
 };
 
 /*
@@ -99,9 +96,9 @@ Player.prototype.update = function() {
 Player.prototype.reset = function() {
     this.row = 4;
     this.col = 2;
-    this.x = this.col * xStep;
-    this.y = this.row * yStep + yOffset;
-}
+    this.x = this.col * X_STEP;
+    this.y = this.row * Y_STEP + Y_OFFSET;
+};
 
 /*
  * Render the player to the game screen
@@ -109,23 +106,23 @@ Player.prototype.reset = function() {
 Player.prototype.render = function() {
     if(this.fading) {
         ctx.globalAlpha = 0.5 * (Math.cos(2 * this.counter/this.maxCount * Math.PI) + 1);
-        if(this.counter == this.maxCount/2) this.reset();
-        if(this.counter == this.maxCount) {
+        if(this.counter === this.maxCount/2) this.reset();
+        if(this.counter === this.maxCount) {
             this.fading = false;
             this.hittable = true;
             this.counter = 0;
         }
         ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
         ctx.globalAlpha = 1.0;
-        this.counter++;
+        this.counter+=1
     } else if(this.dying) {
         ctx.globalAlpha = 0.5 * (Math.cos(2 * this.counter/this.maxCount * Math.PI) + 1);
-        if(this.counter == this.maxCount/4) {
+        if(this.counter === this.maxCount/4) {
             this.dying = false;
         }
         ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
         ctx.globalAlpha = 1.0;
-        this.counter++;
+        this.counter+=1;
     } else {
         if(gameActive) {
             ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
@@ -144,23 +141,23 @@ Player.prototype.handleInput = function(direction) {
                 if(this.col > 0) this.col -= 1;
                 break;
             case 'right':
-                if(this.col < 4) this.col += 1;
+                if(this.col < 4) this.col+=1;
                 break;
             case 'up':
                 if(this.row > 0) {
                     this.row -= 1;
                 } else {
                     console.log("you win");
-                    player.playerWins();
+                    this.playerWins();
                 }
                 break;
             case 'down':
-                if(this.row < 4) this.row += 1;
+                if(this.row < 4) this.row+=1;
                 break;
         }
         this.update();
     }
-}
+};
 
 Player.prototype.playerMinus = function() {
     this.lives -= 1;
@@ -171,7 +168,7 @@ Player.prototype.playerMinus = function() {
         this.dying = true;
     }
     this.hittable = false;
-    if(this.lives == 0) {
+    if(this.lives === 0) {
         gameActive = false;
         this.dying = true;
         $(".game-over").css("visibility", "visible");
@@ -180,49 +177,39 @@ Player.prototype.playerMinus = function() {
             enemy.slowing = true;
         });        
     }
-}
+};
 
 Player.prototype.playerWins = function() {
-    this.score += 1000;
+    this.score+=1000;
     this.fading = true;
     this.winning = true;
     this.hittable = false;
-}
+};
 
 
 
 // Instantiate Player and Enemy objects
-player = new Player();
-allEnemies = [];
-for(var i = 0; i < 9; i++) {
+var player = new Player();
+var allEnemies = [];
+for(var i = 0; i < 9; i+=1) {
     allEnemies.push(new Enemy());
     var n = i%3;
-    allEnemies[i].y = yOffset + yStep * n;
+    allEnemies[i].y = Y_OFFSET + Y_STEP * n;
 }
 
 
 function startOver() {
     player = new Player();
     allEnemies = [];
-    for(var i = 0; i < 9; i++) {
+    for(var i = 0; i < 9; i+=1) {
         allEnemies.push(new Enemy());
         var n = i%3;
-        allEnemies[i].y = yOffset + yStep * n;
+        allEnemies[i].y = Y_OFFSET + Y_STEP * n;
     }
     $(".game-over").css("visibility", "hidden");
-    document.getElementById("count").innerHTML = player.lives;
     gameActive = true;
-    charIndex = Math.floor(Math.random()*images.length);
-    $(".avatar-img").remove();
-    var img = $("<img />").attr('src', images[charIndex]).attr('class', 'avatar-img')
-        .on('load', function() {
-            if (!this.complete || typeof this.naturalWidth == "undefined" || this.naturalWidth == 0) {
-                console.log('broken image!');
-            } else {
-                $("#avatar").append(img);
-                player.sprite = images[charIndex];
-            }
-        });}
+    player.sprite = images[Math.floor(Math.random()*images.length)];    
+}
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
